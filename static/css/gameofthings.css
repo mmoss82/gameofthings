@@ -1,0 +1,38 @@
+.button-hide {
+	display: none;
+}
+.button-show {
+	display: block;
+}
+#button-guessed {
+	width: 100%;
+}
+.board-answer-table {
+	width: 95%;
+}
+.board-text {
+	font-size: 30px;
+}
+.name-btn {
+	width: 100%;
+	margin-top: 4px;
+}
+.container-wide{
+	width: 100%;
+}
+.navbar .container table {
+	text-align: center;
+}
+.player-guessed {
+	text-decoration: line-through;
+}
+div.push-to-bottom{
+  position: fixed;
+  bottom: 85px;
+	text-align: center;
+	width: 90%;
+}
+div.push-to-bottom button{
+  width: 100%;
+	margin-top: 4px;
+}

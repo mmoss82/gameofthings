@@ -13,43 +13,31 @@
     <link href="static/css/gameofthings.css" rel="stylesheet">
   </head>
   <body>
-		<div class="container board-answer-table">
-		  <h2 style="text-align:center">Game of Things: Board</h2>
+		<div class="container container-wide">
+			<h2 style="text-align:center">GoT Reader</h2>
+			
 			<div class="row">
 				<div class="col-md-12">
-				  <table class="table" id="answers-table">
-					    <thead>
-					      <tr>
-					        <th>Answers</th>
-					      </tr>
-					    </thead>
+				  <table class="table" id="players-table">
 				    <tbody class="board-text">
-						</tbody>
+				    </tbody>
 				  </table>
 				</div>
-				<nav class="navbar navbar-default navbar-fixed-bottom">
-				  <div class="container container-wide">
-					  <table class="table" id="players-table">
-					    <tbody class="board-text">
-								<tr></tr>
-					    </tbody>
-						</table>
-				  </div>
-				</nav>
-			</div>          
+			</div>
+			<div id="show-button-div" class="push-to-bottom">
+				<button class="btn btn-lg" id="show-answers">SHOW ANSWERS</button>
+				<button class="btn btn-lg" id="show-answers">NEXT ROUND</button>
+			</div>
+			
 		</div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="static/js/jquery-1.11.3.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="static/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="static/js/socket.io.js"></script>
 		<script type="text/javascript" charset="utf-8">
 		    var socket = io.connect('http://' + document.domain + ':' + location.port);
-		    socket.on('connect', function() {
-		        socket.emit('my event', {data: 'I\'m connected!'});
-		    });
 		</script>
-		
-		<script src="static/js/gameofthings.board.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+		<script src="static/js/gameofthings.reader.js"></script>
   </body>
 </html>

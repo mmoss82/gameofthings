@@ -13,20 +13,33 @@
   </head>
   <body>
 		<div class="container">
-			<h2>Game of Things</h2>
-			<h3>Sign In</h3>
-			<form method="post" action="addplayer">
+			<h2 style="text-align:center">Game of Things</h2>
+			
+			<div class="row" style="margin: 2px">
+				<div class="btn-group" role="group" aria-label="...">
+           <button id="user-button" type="button" class="btn btn-default btn-md">
+					 <span class="glyphicon glyphicon-user"></span>
+					 <span id="username"></span>
+				</div>				
+			</div>
+			
+			<form method="post" action="submitanswer">
 			  <div class="form-group">
-			    <label for="name">Name</label>
-			    <input name="name" type="text" class="form-control" id="name" value="Matt" required>
+			    <label for="answer">Answer</label>
+			    <input name="answer" type="text" class="form-control" id="answer" required>
 			  </div>
-			  <button id="sign-in" class="btn btn-default">Submit</button>
+			  <button id="player-submit" class="btn btn-default">Submit</button>
 			</form>
 			
 		</div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="static/js/jquery-1.11.3.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
+		<script type="text/javascript" src="static/js/socket.io.js"></script>
+		<script type="text/javascript" charset="utf-8">
+		    var socket = io.connect('http://' + document.domain + ':' + location.port);
+		</script>
     <script src="static/js/bootstrap.min.js"></script>
+		<script src="static/js/gameofthings.player.js"></script>
   </body>
 </html>
