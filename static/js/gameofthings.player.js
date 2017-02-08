@@ -26,6 +26,7 @@ var gameofthingsp = (function () {
 		  success: function (data) {
 				console.log('results',data);
 				$("#username").text(data.user);
+				$("#submitted-answer").text(data.answer);
 		  },
 			error: function (err) {
 				console.log(err);
@@ -33,12 +34,19 @@ var gameofthingsp = (function () {
 		});
 	})();
 	
+	socket.on('clear_answers', function(data) {
+		$("#submitted-answer").text("");
+		$("#submitted-answer-key").text("Answer:");
+	})
+	
 	user_button.on("click", function(e) {
-		var username = prompt('What is your name?');
+		var username = prompt('Enter your name?');
+
+		username = username.replace(" ", "_");
+
 		var data = {
 			"username": username
 		}
-		
 		$.ajax({
 		  type: "POST",
 		  url: 'adduser',
@@ -59,10 +67,10 @@ var gameofthingsp = (function () {
 	submit.on("click", function(e) {
 		e.preventDefault();		
 		console.log("submitting");
-		
+		var answer_str = $("#answer").val();
 		var data = {
-			'answer':$("#answer").val(),
-			'username':$("#username").text()
+			'answer':answer_str,	
+			'username':$("#username").text().replace(" ", "_")
 		};
 		
 		console.log(data);
@@ -70,26 +78,23 @@ var gameofthingsp = (function () {
 		  type: "POST",
 		  url: 'submitAnswer',
 		  data: data,
-		  success: function (data) {
-		  	console.log(data);
+			success: function(data) {
+				console.log('success',data);
+				$("#submitted-answer").text(answer_str);
 				answer.val("");
-		  },
+				if( data.is_reader ) {
+					window.location.replace('reader');
+				}
+				
+			},
 			error: function (err) {
-				console.log(err);
+				console.log('err',err);
+				$("submitted-answer-key").text('Answer: ' + err.message);
 			},
 		  dataType: 'json'
 		});
 		
 	});
-	
-	socket.on('answer_submitted', function(data) {
-		console.log("test");
-		if( data.success ) {
-		} else {
-			console.log(data.message);
-		}
-	});
-	
 	
 
 })();

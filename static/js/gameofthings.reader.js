@@ -72,6 +72,22 @@ var gameofthingsp = (function () {
 			},
 		});
 	};
-	
+
+	$("#next-round").on("click", function(e) {
+		if (confirm('Are you sure you want to end this round?')) {
+			$.ajax({
+			  type: "GET",
+			  url: 'nextround',
+			  success: function (data) {
+					window.location.replace("/");
+			  },
+				error: function (err) {
+					console.log(err);
+				},
+			});
+		} else {
+		    // Do nothing!
+		}
+	});
 
 })();

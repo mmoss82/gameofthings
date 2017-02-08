@@ -1,3 +1,9 @@
+body {
+	background-color: rgb(162,191,79);
+}
+.form-control, .navbar, .btn, input, button, span {
+	background-color: rgb(230,230,230);
+}
 .button-hide {
 	display: none;
 }
@@ -28,11 +34,14 @@
 }
 div.push-to-bottom{
   position: fixed;
-  bottom: 85px;
+  bottom: 10px;
 	text-align: center;
 	width: 90%;
 }
 div.push-to-bottom button{
   width: 100%;
 	margin-top: 4px;
+}
+.answer-text p {
+	color: rgb(230,230,230);
 }

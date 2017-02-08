@@ -43,9 +43,20 @@ var gameofthingsb = (function () {
 		}
 	})
 	
+	socket.on('clear_answers', function(data) {
+		if( 0 < answers.find("tbody tr").length ) {
+			$(answers.find("tbody")[0]).empty();
+			players.empty();
+		} else {
+			$(answers.find("tbody")[0]).empty();
+			players.empty();
+		}
+	})
+	
 	var toggleGuessed = function(username){
 		var targets = $(".player-" +  username);
 		targets.each( function(i, row) {
+			console.log('found');
 			$(row).toggleClass("player-guessed");
 		})
 	}
