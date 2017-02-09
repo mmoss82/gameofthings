@@ -10,7 +10,7 @@ body {
 .button-show {
 	display: block;
 }
-#button-guessed {
+#button-guessed, #player-submit{
 	width: 100%;
 }
 .board-answer-table {
@@ -31,6 +31,7 @@ body {
 }
 .player-guessed {
 	text-decoration: line-through;
+	color: rgb(80, 80, 80);
 }
 div.push-to-bottom{
   position: fixed;

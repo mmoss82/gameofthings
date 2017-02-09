@@ -55,7 +55,7 @@ def checkLogin():
         return response
     else:
         response = jsonify({})
-        repsonse.status_code = 401
+        response.status_code = 401
         return response
 
 @app.route("/board", methods=['GET'])
@@ -70,10 +70,19 @@ def getReader():
 def addUser():
 
     username = request.form["username"].lower()
+    
+    if game.findPlayer(username):
+        print "player already exists!"
+        c = 1
+        while game.findPlayer(username) != False:
+            username = username + str(c)
+            print username
+            c+=1
+    
     session['username'] = username
     game.addPlayer(username)
     
-    response = jsonify({})
+    response = jsonify({'username':username})
     response.status_code = 200
     return response
 

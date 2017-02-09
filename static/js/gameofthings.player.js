@@ -26,6 +26,7 @@ var gameofthingsp = (function () {
 		  success: function (data) {
 				console.log('results',data);
 				$("#username").text(data.user);
+				$("#user-button-label").text("");
 				$("#submitted-answer").text(data.answer);
 		  },
 			error: function (err) {
@@ -37,30 +38,32 @@ var gameofthingsp = (function () {
 	socket.on('clear_answers', function(data) {
 		$("#submitted-answer").text("");
 		$("#submitted-answer-key").text("Answer:");
-	})
+	});
 	
 	user_button.on("click", function(e) {
+		
+		if( $("#username").text() != "" ) { return; }
 		var username = prompt('Enter your name?');
-
-		username = username.replace(" ", "_");
-
-		var data = {
-			"username": username
+		if( username != null ) {			
+			username = username.replace(" ", "_");
+			var pdata = {
+				"username": username
+			}			
+			$.ajax({
+			  type: "POST",
+			  url: 'adduser',
+			  data: pdata,
+			  success: function (data) {
+					console.log('success',data);
+					$("#user-button-label").text("");
+					$("#username").text(data.username);
+			  },
+				error: function (err) {
+					console.log('err',err);
+				},
+			  dataType: 'json'
+			});
 		}
-		$.ajax({
-		  type: "POST",
-		  url: 'adduser',
-		  data: data,
-		  success: function (data) {
-				if( username != null ) {
-					$("#username").text(username);
-				}
-		  },
-			error: function (err) {
-				console.log(err);
-			},
-		  dataType: 'json'
-		});		
 	});
 	
 	

@@ -18,10 +18,11 @@
 			
 			<div class="row" style="margin: 2px">
 				<div class="btn-group" role="group" aria-label="...">
-           <button id="user-button" type="button" class="btn btn-default btn-md">
+           <button id="user-button" type="button" name="user-button" class="btn btn-default btn-lg">
 					 <span class="glyphicon glyphicon-user"></span>
 					 <span id="username"></span>
 				</div>				
+				<label id="user-button-label" for="user-button">Click to add user</label>
 			</div>
 			
 			<form method="post" action="submitanswer">
@@ -29,7 +30,7 @@
 			    <label for="answer">Answer</label>
 			    <input name="answer" type="text" class="form-control" id="answer" required>
 			  </div>
-			  <button id="player-submit" class="btn btn-default">Submit</button>
+			  <button id="player-submit" class="btn btn-default btn-lg">Submit</button>
 			</form>
 			<br	>
 			<div class="answer-text">
