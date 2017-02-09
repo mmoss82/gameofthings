@@ -15,6 +15,17 @@ Remaining answers and users are displayed on a screen so all can easily see.
 
 The game and player data is stored in memory, no db yet so if the server restarts during play, that round is lost.
 
+### Installation
+
+1. If you don't already have it, install pip:
+```sudo easy_install pip```
+
+2. Next, use pip to install the requirements:
+```sudo pip install -r requirements.txt```
+
+(If you're on OS X El Capitan or above, you may need to use this command instead, 
+as pip will get hung up trying to uninstall a built-in version of six 1.4.1:
+```sudo pip install -r requirements.txt --ignore-installed six```)
 
 ### How to use:
 
