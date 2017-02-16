@@ -86,32 +86,8 @@ def addUser():
     response.status_code = 200
     return response
 
-@app.route("/guessed", methods=['POST'])
-def guessed():
-    
-    username = request.form["username"].lower()
-    player = game.findPlayer(username)
-    
-    if player != False:
-    
-        if player.hasAnswer:
-            player.setGuessed( True )
-            emit('playerGuessed', {'name': username})
-            response = jsonify({})
-            response.status_code = 200
-            return response
-        else:
-            response = jsonify({'message':'player did not submit answer'})
-            response.status_code = 403
-            return response
-
-    else:
-        response = jsonify({'message':'player does not exist'})
-        response.status_code = 500
-        return response
-
 @app.route('/submitAnswer', methods=['POST'])
-def submitAnswer():
+def addAnswer():
     
     answer = request.form["answer"]
     username = request.form["username"]
@@ -125,7 +101,9 @@ def submitAnswer():
             if not had_answer:
                 socketio.emit("answer_submitted", {
                     "name" : username,
-                    "answer": answer
+                    "answer": answer,
+                    "num_answered" : game.getNumAnswered(),
+                    "num_players" : game.getNumPlayers()
                 })
             
             if game.isReader(player):
@@ -160,21 +138,43 @@ def getAnswers():
     for player in game.players:
         if player.hasAnswer:
             answers.append({
-                'name':player.name,
-                'answer': player.answer
+                'username':player.name,
+                'answer': player.answer,
+                'displayed': player.displayed,
+                'guessed': player.guessed
             })
-    response = jsonify({'answers':answers})
+    response = jsonify({
+        'answers':answers,
+        'num_answered' : game.getNumAnswered(),
+        'num_players' : game.getNumPlayers(),
+        'all_displayed' : game.getNumPlayers() == game.getNumDisplayed()                
+    })
     response.status_code = 200
     return response
     
-@app.route('/answerguessed/<username>', methods=['GET'])
-def answerGuessed(username):
+@app.route('/answerclicked/<username>', methods=['GET'])
+def answerClicked(username):
     player = game.findPlayer(username)
-    
     if player != False:
-        player.setGuessed(not player.guessed)
-        socketio.emit("player_guessed", {"username" : username})
-        response = jsonify({})
+
+        response = jsonify({
+            'displayed' : player.displayed,
+            'guessed' : player.guessed            
+        })
+
+        if(player.displayed):
+            player.guessed = not player.guessed
+        else:
+            player.displayed = True
+        
+        socketio.emit('answer_clicked', {
+            'username' : username,
+            'answer' : player.answer,
+            'displayed' : player.displayed,
+            'guessed' : player.guessed,
+            'all_displayed' : game.getNumDisplayed() == game.getNumPlayers()
+        })
+        
         response.status_code = 200
         return response
     else:
@@ -204,6 +204,25 @@ def nextRound():
     socketio.emit('clear_answers', {})
     response = jsonify({})
     response.status_code = 200
+    return response
+
+@app.route('/setquestion', methods=['POST'])
+def setQuestion():
+    question = request.form["question"]
+    game.question = question
+
+    socketio.emit('set_question', {'question':question})
+
+    response = jsonify({'question':question})
+    response.status_code = 200
+
+    return response
+
+@app.route('/getquestion', methods=['GET'])
+def getQuestion():
+    response = jsonify({'question':game.question})
+    response.status_code = 200
+    
     return response
 
 @socketio.on('connect')

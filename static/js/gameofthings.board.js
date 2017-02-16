@@ -9,40 +9,65 @@
  */
 /* global $, players, answers */
 
+// TODO FIX REFRESH - SHOW GUESSED ANSWERS
+
 var gameofthingsb = (function () {
   'use strict';
 
 	console.log("test");
 	
-	var player_array = [];
 	var answers = $("#answers-table");
-	var players = $("#players-table tr");
+	var players = $("#board-players-table tr");
+	var player_list = [];
 
-	/* disabled for now - populated from reader control
-	socket.on('answer_submitted', function(data) {
-		
-		fillAnswerTable(data.answer);
-		fillPlayerTable(data.name);
-		
-		console.log(data);
-	});
-	*/
+	// Get the submitted answers from the server.
+	// This will protect the answers from being lost if the
+	// page is refreshed.
+	var getAnswers = (function () {
+		$.ajax({
+		  type: "GET",
+		  url: 'getanswers',
+		  success: function (data) {
+				console.log('answers:',data);
+				var answers_array = data.answers;				
+				for( var i = 0; i < answers_array.length; i ++ ) {					
+					if(player_list.indexOf(answers_array[i].username) < 0) {
+						player_list.push(answers_array[i].username);
+					}
+				}
+				// if all the answers are displayed, we can show the users.
+				if(data.all_displayed) {
+					showPlayers(player_list);
+				}
+				// show the answers either way.
+				showAnswers(answers_array);
+		  },
+			error: function (err) {
+				console.log(err);
+			},
+		  dataType: 'json'
+		});
+	})();
 	
-	socket.on('player_guessed', function(data) {
-		toggleGuessed(data.username);
-	});
+	// initial load question and set on display
+	var getQuestion = (function(){
+		$.ajax({
+		  type: "GET",
+		  url: 'getquestion',
+		  success: function (data) {
+				var q = data.question;
+				if(q != null) {
+					$("#board-question").text(data.question);					
+				}
+		  },
+			error: function (err) {
+				console.log(err);
+			},
+		  dataType: 'json'
+		});
+	})();
 	
-	socket.on('show_answers', function(data) {
-		if( 0 < answers.find("tbody tr").length ) {
-			$(answers.find("tbody")[0]).empty();
-			players.empty();
-		} else {
-			$(answers.find("tbody")[0]).empty();
-			players.empty();
-			showAnswers(data.answers);
-		}
-	})
-	
+	// when you trigger a new round, clear the board
 	socket.on('clear_answers', function(data) {
 		if( 0 < answers.find("tbody tr").length ) {
 			$(answers.find("tbody")[0]).empty();
@@ -51,44 +76,99 @@ var gameofthingsb = (function () {
 			$(answers.find("tbody")[0]).empty();
 			players.empty();
 		}
-	})
+	});
 	
-	var toggleGuessed = function(username){
-		var targets = $(".player-" +  username);
-		targets.each( function(i, row) {
-			console.log('found');
-			$(row).toggleClass("player-guessed");
-		})
-	}
+	// socket connection when question is set
+	socket.on('set_question', function(data) {
+		$("#board-question").text(data.question);
+	});
 	
-	var fillAnswerTable = function(answer, username) {
-		var row = $('<tr><td>' + answer + '</td></tr>');
-		row.attr('class', "player-" + username);
+	// when the reader clicks an answer, this handles what the board does
+	socket.on('answer_clicked', function(data) {
+		var targets = $(".player-" +  data.username);
+
+		if( 0 < targets.length ){ // they are displayed, toggle guessed
+			targets.each( function(i, row) {
+				console.log('found');
+				$(row).toggleClass("player-guessed");
+			})
+		} else { // not displayed yet, display them
+			showAnswers([data]);
+			if(player_list.indexOf(data.username) < 0) {
+				player_list.push(data.username);
+			}
+			if(data.all_displayed) {
+				showPlayers(player_list);
+			}
+		}
+	});
+	
+	// randomize the players so they're not in the same order
+	// as the answers! I stole this.
+	var shuffle = function(array) {
+	  var currentIndex = array.length, temporaryValue, randomIndex;
+
+	  // While there remain elements to shuffle...
+	  while (0 !== currentIndex) {
+
+	    // Pick a remaining element...
+	    randomIndex = Math.floor(Math.random() * currentIndex);
+	    currentIndex -= 1;
+
+	    // And swap it with the current element.
+	    temporaryValue = array[currentIndex];
+	    array[currentIndex] = array[randomIndex];
+	    array[randomIndex] = temporaryValue;
+	  }
+
+	  return array;
+	};
+	
+	// Populate the answers on the board.
+	var fillAnswerTable = function(answer, username, guessed) {
+		var 
+			row = $('<tr><td>' + answer + '</td></tr>'),
+			player = $(".player-" + username);
+		
+		row.addClass('player-' + username);
+
+		if(guessed) {
+			row.addClass('player-guessed'); // answer
+			player.addClass('player-guessed'); // username
+		}
+
 		answers.append(row);
 	};
 	
+	// Populate the player names on the board
 	var fillPlayerTable = function(username) {
-		var data = $('<td>' + username + '</td>');
-		data.attr('class', "player-" + username);
-		players.append(data);		
+		var player = $('<td>' + username + '</td>');
+		
+		// decide whether or not this answer has been guessed yet or not
+		var guessed = $('.player-' + username).hasClass('player-guessed');
+		
+		if(guessed) {player.addClass('player-guessed');}
+		player.addClass('player-' + username);
+		players.append(player);
+	};
+	
+	var showPlayers = function(player_list) {
+		player_list = shuffle(player_list);
+		for( var i = 0; i < player_list.length; i ++ ) {
+			fillPlayerTable(player_list[i]);
+		}			
 	};
 	
 	var showAnswers = function (answers_array) {
-  	console.log(answers_array);
-		var username;
-		var username_array = [];
 		for( var i = 0; i < answers_array.length; i ++ ) {
-			username = answers_array[i].name;
-			fillAnswerTable(answers_array[i].answer, username);
-			username_array.push(username);
+			if(answers_array[i].displayed) {
+				fillAnswerTable(
+					answers_array[i].answer,
+				  answers_array[i].username, 
+					answers_array[i].guessed
+				);
+			}
 		}	
-
-		username_array.sort();		
-		//o.sort(function(a, b){return 0.5 - Math.random()})
-
-		for( var i = 0; i < username_array.length; i ++ ) {
-			fillPlayerTable(username_array[i]);			
-		}
 	};
 	
 })();

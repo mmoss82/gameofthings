@@ -17,29 +17,33 @@ var gameofthingsp = (function () {
 	var user = $("#username").text();
 	var answer = $("#answer");
 
-	console.log("user:",user);
+	answer.focus();
 	
+	// make sure we are registered and ready to play!
 	var checklogin = (function() {
 		$.ajax({
 		  type: "GET",
 		  url: 'checklogin',
 		  success: function (data) {
 				console.log('results',data);
-				$("#username").text(data.user);
-				$("#user-button-label").text("");
-				$("#submitted-answer").text(data.answer);
+				$("#username").text(data.user); // set the name
+				$("#user-button-label").text(""); // clear the help text
+				$("#submitted-answer").text(data.answer); // set the submitted answer
 		  },
 			error: function (err) {
 				console.log(err);
+				user_button.focus();
 			},
 		});
 	})();
 	
+	// when you trigger a new round, clear last round's answer
 	socket.on('clear_answers', function(data) {
 		$("#submitted-answer").text("");
 		$("#submitted-answer-key").text("Answer:");
 	});
 	
+	// set the name and register with the server
 	user_button.on("click", function(e) {
 		
 		if( $("#username").text() != "" ) { return; }
@@ -57,6 +61,7 @@ var gameofthingsp = (function () {
 					console.log('success',data);
 					$("#user-button-label").text("");
 					$("#username").text(data.username);
+					answer.focus();
 			  },
 				error: function (err) {
 					console.log('err',err);
@@ -66,36 +71,40 @@ var gameofthingsp = (function () {
 		}
 	});
 	
-	
+	// submit the answer to server
 	submit.on("click", function(e) {
 		e.preventDefault();		
-		console.log("submitting");
 		var answer_str = $("#answer").val();
-		var data = {
-			'answer':answer_str,	
-			'username':$("#username").text().replace(" ", "_")
-		};
 		
-		console.log(data);
-		$.ajax({
-		  type: "POST",
-		  url: 'submitAnswer',
-		  data: data,
-			success: function(data) {
-				console.log('success',data);
-				$("#submitted-answer").text(answer_str);
-				answer.val("");
-				if( data.is_reader ) {
-					window.location.replace('reader');
-				}
+		if( answer_str.replace(/\s+/, "").length > 0 ) {
+			console.log("submitting");
+			var data = {
+				'answer':answer_str,	
+				'username':$("#username").text().replace(" ", "_")
+			};
+		
+			console.log(data);
+			$.ajax({
+			  type: "POST",
+			  url: 'submitAnswer',
+			  data: data,
+				success: function(data) {
+					console.log('success',data);
+					$("#submitted-answer").text(answer_str); // set answer text
+					answer.val("");
+					if( data.is_reader ) {
+						window.location.replace('reader');
+					}
 				
-			},
-			error: function (err) {
-				console.log('err',err);
-				$("submitted-answer-key").text('Answer: ' + err.message);
-			},
-		  dataType: 'json'
-		});
+				},
+				error: function (err) {
+					console.log('err',err);
+					$("submitted-answer-key").text('Answer: ' + err.message);
+				},
+			  dataType: 'json'
+			});
+		}
+
 		
 	});
 	

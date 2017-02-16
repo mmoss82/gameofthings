@@ -1,7 +1,13 @@
 body {
 	background-color: rgb(162,191,79);
 }
-.form-control, .navbar, .btn, input, button, span {
+title {
+  font-family: "game-of-thrones", Times, serif;
+}
+.navbar, span {
+	background-color: rgb(230,230,230);
+}
+.btn-default {
 	background-color: rgb(230,230,230);
 }
 .button-hide {
@@ -19,9 +25,25 @@ body {
 .board-text {
 	font-size: 30px;
 }
-.name-btn {
-	width: 100%;
+#players-table {
+	text-align: center;
+}
+.reader-answer-btn {
+	width: 97%;
 	margin-top: 4px;
+	white-space: normal;
+	font-size: 16px;
+	text-align: start;
+}
+.reader-top-row {
+	padding-left: 5px;
+}
+.reader-btn-guessed {
+	text-decoration: line-through;
+}
+.reader-totals {
+	font-size: 20px;
+	padding-top: 6px;
 }
 .container-wide{
 	width: 100%;

@@ -7,6 +7,7 @@ class Game():
         self.players = []
         self.reader_index = 0
         self.answers_submitted = False
+        self.question = None
         
     def addPlayer(self, name):
         
@@ -61,5 +62,24 @@ class Game():
         self.answers_submitted = False
         for player in self.players:
             player.nextRound()
+            
+    def getNumPlayers(self):
         
+        return len(self.players)
+        
+    def getNumAnswered(self):
+        
+        n = 0
+        for p in self.players:
+            if p.hasAnswer:
+                n += 1
+        return n
+        
+    def getNumDisplayed(self):
+        
+        n = 0
+        for p in self.players:
+            if p.displayed:
+                n+= 1        
+        return n
         
