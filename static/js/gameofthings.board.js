@@ -76,6 +76,7 @@ var gameofthingsb = (function () {
 			$(answers.find("tbody")[0]).empty();
 			players.empty();
 		}
+		$("#board-question").empty();
 	});
 	
 	// socket connection when question is set

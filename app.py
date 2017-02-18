@@ -48,7 +48,7 @@ def checkLogin():
             answer = player.answer
         
         response = jsonify({
-            'user':username,
+            'username':username,
             'answer':answer
         })
         response.status_code = 200
@@ -100,7 +100,7 @@ def addAnswer():
 
             if not had_answer:
                 socketio.emit("answer_submitted", {
-                    "name" : username,
+                    "username" : username,
                     "answer": answer,
                     "num_answered" : game.getNumAnswered(),
                     "num_players" : game.getNumPlayers()
@@ -190,7 +190,7 @@ def showAnswers():
 
     for player in game.players:
         if player.hasAnswer:
-            answers.append({'name':player.name, 'answer':player.answer})
+            answers.append({'username':player.name, 'answer':player.answer})
     
     socketio.emit('show_answers', {'answers':answers})
     response = jsonify({})
@@ -225,6 +225,19 @@ def getQuestion():
     
     return response
 
+@app.route('/get/players', methods=['GET'])
+def getPlayers():
+
+    players = []
+
+    for p in game.players:
+        players.append(p.name)
+        
+    response = jsonify({'players':players})
+    response.status_code = 200
+    
+    return response
+    
 @socketio.on('connect')
 def test_connect():
     print "# user connected"
@@ -233,6 +246,6 @@ def test_connect():
 app.secret_key = "secretforrealthough"
 
 if __name__ == "__main__":
-    socketio.run(app)#,host="192.168.1.7")
+    socketio.run(app,host="192.168.1.7")
     
     

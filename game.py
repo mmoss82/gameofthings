@@ -60,6 +60,7 @@ class Game():
     def nextRound(self):
 
         self.answers_submitted = False
+        self.question = None
         for player in self.players:
             player.nextRound()
             

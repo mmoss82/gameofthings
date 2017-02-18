@@ -26,7 +26,7 @@ var gameofthingsp = (function () {
 		  url: 'checklogin',
 		  success: function (data) {
 				console.log('results',data);
-				$("#username").text(data.user); // set the name
+				$("#username").text(data.username); // set the name
 				$("#user-button-label").text(""); // clear the help text
 				$("#submitted-answer").text(data.answer); // set the submitted answer
 		  },

@@ -15,6 +15,7 @@ var gameofthingsp = (function () {
 	var guessed = $("#guessed-table");
 	var players = $("#players-table");
 	
+	// check if the question is set
 	var setQuestionPrompt = (function(){
 		$.ajax({
 		  type: "GET",
@@ -32,8 +33,9 @@ var gameofthingsp = (function () {
 		});		
 	})();
 	
+	// prompt user for question, send to server
 	var setQuestion = function() {
-		var question = prompt("Enter the question");
+		var question = prompt("You are the reader! Please enter the question for this round.");
 		if(question != null) {			
 			var data = { 'question': question };			
 			$.ajax({
@@ -51,6 +53,7 @@ var gameofthingsp = (function () {
 		}				
 	};
 	
+	// button to edit the question
 	$("#reader-question-btn").on("click", function() {
 		setQuestion();
 	});
@@ -80,18 +83,33 @@ var gameofthingsp = (function () {
 		});
 	})();
 	
+	// populate the user dropdown list
+	var getPlayers = (function() {
+		$.ajax({
+			type: "GET",
+			url: "get/players",
+			success: function (data) {
+				for( var i = 0; i < data.players.length; i++ ){
+					updateUserDropdown(data.players[i]);					
+				}
+			},
+			error: function (err) {
+				console.log(err);
+			}
+		})
+	})();
+	
 	// retreive message from server that new answer
 	// has been submitted
 	socket.on('answer_submitted', function(data) {
 		addAnswer(data.username, data.answer);
 		updateTotals(data.num_answered, data.num_players);
-		console.log(data);
+		updateUserDropdown(data.username);
 	});
 	
 	// populate the reader page with answers as
 	// they are submitted
 	var addAnswer = function( username, answer, displayed, guessed ) {
-		console.log('adding: ',username,answer)
 
 		var button = $('<button class="btn btn-lg btn-info reader-answer-btn">' + answer + "</button>");
 		button.attr("id",username);
@@ -103,8 +121,13 @@ var gameofthingsp = (function () {
 		players.append(button);
 	}
 	
+	var updateUserDropdown = function(username) {
+		console.log("updating",username);
+		$("#reader-user-dropdown").append($("<li><a>"+username+"</a></li>"));			      
+	};
+	
 	// shows how many players have submitted answers yet
-	var updateTotals = function( num_answered, num_players ) {
+	var updateTotals = function( num_answered, num_players, username ) {
 		$("#num_answered").text(num_answered);
 		$("#num_players").text(num_players);
 	};
@@ -125,7 +148,7 @@ var gameofthingsp = (function () {
 	
 	// handle the click of answer button
 	var answerClickedEvent = function (e) {
-		var username = e.toElement.id;
+		var username = e.target.id;
 		$.ajax({
 		  type: "GET",
 		  url: 'answerclicked/' + username,
